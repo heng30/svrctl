@@ -35,6 +35,7 @@ func startService() {
 	file, err := os.Create(pidPath)
 	if err != nil {
 		logger.Warnf("open %s failed, error: %v", pidPath, err)
+        return
 	}
 	defer file.Close()
 
@@ -42,6 +43,7 @@ func startService() {
 	_, err = file.WriteString(fmt.Sprintf("%d\n", pid))
 	if err != nil {
 		logger.Warnf("save pid in %s failed, error: %v", pidPath, err)
+        return 
 	}
 
 	go waitStopSignal()
@@ -68,6 +70,7 @@ func runAsDaemon(chpidDir, closefd bool) bool {
 
 	if chpidDir {
 		os.Chdir("/")
+		return false
 	}
 
 	if closefd {
@@ -78,6 +81,7 @@ func runAsDaemon(chpidDir, closefd bool) bool {
 			syscall.Dup2(fd, int(os.Stderr.Fd()))
 		} else {
 			logger.Warnf("open /dev/null failed: %v", err)
+            return false
 		}
 	}
 	return true
